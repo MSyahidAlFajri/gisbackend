@@ -26,51 +26,6 @@ func SetConnection2dsphere(mongoenv, dbname, collname string) *mongo.Database {
 	return Create2dsphere(DBmongoinfo)
 }
 
-// ----------------------------------------------------------------------- User -----------------------------------------------------------------------
-
-// Create
-
-func InsertUser(mongoenv *mongo.Database, collname string, datauser User) interface{} {
-	return InsertOneDoc(mongoenv, collname, datauser)
-}
-
-// Read
-
-func GetAllUser(mconn *mongo.Database, collname string) []User {
-	return GetAllDoc[[]User](mconn, collname)
-}
-
-func FindUser(mconn *mongo.Database, collname string, userdata User) User {
-	filter := bson.M{"username": userdata.Username}
-	return GetOneDoc[User](mconn, collname, filter)
-}
-
-func IsPasswordValid(mconn *mongo.Database, collname string, userdata User) bool {
-	filter := bson.M{"username": userdata.Username}
-	res := GetOneDoc[User](mconn, collname, filter)
-	hashChecker := CheckPasswordHash(userdata.Password, res.Password)
-	return hashChecker
-}
-
-func UsernameExists(mconn *mongo.Database, collname string, userdata User) bool {
-	filter := bson.M{"username": userdata.Username}
-	return DocExists[User](mconn, collname, filter, userdata)
-}
-
-// Update
-
-func UpdateUser(mconn *mongo.Database, collname string, datauser User) interface{} {
-	filter := bson.M{"username": datauser.Username}
-	return ReplaceOneDoc(mconn, collname, filter, datauser)
-}
-
-// Delete
-
-func DeleteUser(mconn *mongo.Database, collname string, userdata User) interface{} {
-	filter := bson.M{"username": userdata.Username}
-	return DeleteOneDoc(mconn, collname, filter)
-}
-
 // ---------------------------------------------------------------------- Geojson ----------------------------------------------------------------------
 
 // Create
