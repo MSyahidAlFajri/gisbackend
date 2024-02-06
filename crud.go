@@ -84,3 +84,6 @@ func Center(mconn *mongo.Database, collname string, coordinates Point) string {
 func CenterSphere(mconn *mongo.Database, collname string, coordinates Point) string {
 	return GetCenterSphereDoc(mconn, collname, coordinates)
 }
+func polygon(mconn *mongo.Database, collname string, coordinates Polygon) string {
+	return GetPolygon(mconn, collname, coordinates)
+}
