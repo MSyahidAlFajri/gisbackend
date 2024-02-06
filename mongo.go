@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/Befous/BackendGin/models"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
@@ -146,55 +147,31 @@ func DocExists[T any](db *mongo.Database, collname string, filter bson.M, doc T)
 	return err == nil
 }
 
-func GetGeoIntersectsDoc(db *mongo.Database, collname string, coordinates Polygon) (result string) {
+func GetGeoIntersectsDoc[T any](db *mongo.Database, collname, locfield string, geospatial models.Geospatial) (result []T, err error) {
 	filter := bson.M{
-		"geometry": bson.M{
+		locfield: bson.M{
 			"$geoIntersects": bson.M{
 				"$geometry": bson.M{
-					"type":        "Polygon",
-					"coordinates": coordinates.Coordinates,
+					"type":        geospatial.Type,
+					"coordinates": geospatial.Coordinates,
 				},
 			},
 		},
 	}
-	var docs []FullGeoJson
-	cur, err := db.Collection(collname).Find(context.TODO(), filter)
+
+	ctx := context.TODO()
+	cur, err := db.Collection(collname).Find(ctx, filter)
 	if err != nil {
-		fmt.Printf("GeoIntersects: %v\n", err)
-		return "Error querying data"
+		fmt.Printf("GetGeoIntersectsDoc: %v\n", err)
+		return nil, err
 	}
-
-	defer cur.Close(context.TODO())
-
-	for cur.Next(context.TODO()) {
-		var doc FullGeoJson
-		err := cur.Decode(&doc)
-		if err != nil {
-			fmt.Printf("Decode Err: %v\n", err)
-			continue
-		}
-		docs = append(docs, doc)
+	defer cur.Close(ctx)
+	err = cur.All(ctx, &result)
+	if err != nil {
+		fmt.Printf("GetGeoIntersectsDoc Cursor Err: %v\n", err)
+		return nil, err
 	}
-
-	if err := cur.Err(); err != nil {
-		fmt.Printf("Cursor Err: %v\n", err)
-		return "Error iterating cursor"
-	}
-
-	// Ambil nilai properti Name dari setiap dokumen
-	var names []string
-	for _, doc := range docs {
-		names = append(names, doc.Properties.Name)
-	}
-
-	// Gabungkan nilai-nilai dengan koma
-	result = strings.Join(names, ", ")
-
-	if result != "" {
-		return "Koordinat anda bersinggungan dengan " + result
-	} else {
-		return "Tidak ada data yang bersinggungan"
-	}
+	return result, nil
 }
 
 func GetGeoWithinDoc(db *mongo.Database, collname string, coordinates Polygon) (result string) {
@@ -478,11 +455,12 @@ func GetCenterSphereDoc(db *mongo.Database, collname string, coordinates Point) 
 
 	return result
 }
-func GetPolygon(db *mongo.Database, collname string, coordinates Polygon) (result string) {
+func GetGeoWitDoc(db *mongo.Database, collname string, coordinates Polygon) (result string) {
 	filter := bson.M{
 		"geometry": bson.M{
 			"$geoWithin": bson.M{
-				"$polygon": bson.M{
+				"$geometry": bson.M{
+					"type":        "Polygon",
 					"coordinates": coordinates.Coordinates,
 				},
 			},

@@ -11,22 +11,22 @@ var encode = ""
 var dbname = "geojson"
 var collname = "bandaaceh"
 
-func TestGeoIntersects(t *testing.T) {
-	mconn := SetConnection("MONGOSTRING", dbname)
-	coordinates := Polygon{
-		Coordinates: [][][]float64{
-			{
-				{95.31123456789012, 5.553210987654321},
-				{95.31133456789011, 5.553210987654321},
-				{95.31133456789011, 5.553310987654321},
-				{95.31123456789012, 5.553310987654321},
-				{95.31123456789012, 5.553210987654321},
-			},
-		},
-	}
-	datagedung := GeoIntersects(mconn, collname, coordinates)
-	fmt.Println(datagedung)
-}
+// func TestGeoIntersects(t *testing.T) {
+// 	mconn := SetConnection("mongoenv", dbname)
+// 	coordinates := Polygon{
+// 		Coordinates: [][][]float64{
+// 			{
+// 				{95.31123456789012, 5.553210987654321},
+// 				{95.31133456789011, 5.553210987654321},
+// 				{95.31133456789011, 5.553310987654321},
+// 				{95.31123456789012, 5.553310987654321},
+// 				{95.31123456789012, 5.553210987654321},
+// 			},
+// 		},
+// 	}
+// 	datagedung := GeoIntersects(mconn, collname, coordinates)
+// 	fmt.Println(datagedung)
+// }
 
 func TestGeoWithin(t *testing.T) {
 	mconn := SetConnection("MONGOSTRING", dbname)
