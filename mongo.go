@@ -366,11 +366,11 @@ func GetBoxDoc(db *mongo.Database, collname string, coordinates Polyline) (resul
 	return result
 }
 
-func GetCenterDoc(db *mongo.Database, collname string, coordinates Point) (result string) {
+func GetCenterDoc(db *mongo.Database, collname string, geo Point) (result string) {
 	filter := bson.M{
 		"geometry": bson.M{
 			"$geoWithin": bson.M{
-				"$center": []interface{}{coordinates.Coordinates, 0.003},
+				"$center": []interface{}{geo.Coordinates, geo.Radius}, // Convert radius from km to radians using Earth's radius
 			},
 		},
 	}
